@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "ATLCloudConferenceDemo", "ATLCloudConferenceDemo\ATLCloudConferenceDemo.deployproj", "{FE090C9C-B4EF-44DC-9470-AB1FD0E8E1F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoFrontend", "DemoFrontend\DemoFrontend.csproj", "{8E9D1580-D687-432B-B836-40B4B8865743}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FE090C9C-B4EF-44DC-9470-AB1FD0E8E1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE090C9C-B4EF-44DC-9470-AB1FD0E8E1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE090C9C-B4EF-44DC-9470-AB1FD0E8E1F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE090C9C-B4EF-44DC-9470-AB1FD0E8E1F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9D1580-D687-432B-B836-40B4B8865743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9D1580-D687-432B-B836-40B4B8865743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9D1580-D687-432B-B836-40B4B8865743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9D1580-D687-432B-B836-40B4B8865743}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C1C2D99-4FDC-4963-86B0-EC474CB7053A}
+	EndGlobalSection
+EndGlobal
