@@ -2,24 +2,22 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vaults_ATLConfDemoKV_name": {
-            "defaultValue": "ATLConfDemoKV",
+        "KeyvaultName": {
             "type": "String"
         },
-        "privateEndpoints_DemoKVPrivateEndpoint_name": {
-            "defaultValue": "DemoKVPrivateEndpoint",
+        "Location": {
             "type": "String"
         },
-        "privateDnsZones_privatelink_vaultcore_azure_net_name": {
-            "defaultValue": "privatelink.vaultcore.azure.net",
+        "PrivateEndpointName": {
             "type": "String"
         },
-        "networkInterfaces_DemoKVPrivateEndpoint_nic_e40a965d_e523_4f5c_b76a_34b26f50ce08_name": {
-            "defaultValue": "DemoKVPrivateEndpoint.nic.e40a965d-e523-4f5c-b76a-34b26f50ce08",
+        "PrivateDNSZonePrivateLinkName": {
             "type": "String"
         },
-        "virtualNetworks_Backend_externalid": {
-            "defaultValue": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/Backend",
+        "PrivateEndpointNetworkInterface": {
+            "type": "String"
+        },
+        "VirtualNetworkBackendResourceId": {
             "type": "String"
         }
     },
@@ -28,7 +26,7 @@
         {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2022-07-01",
-            "name": "[parameters('vaults_ATLConfDemoKV_name')]",
+            "name": "[parameters('KeyvaultName')]",
             "location": "eastus",
             "properties": {
                 "sku": {
@@ -90,13 +88,13 @@
                         }
                     }
                 ],
-                "enabledForDeployment": false,
+                "enabledForDeployment": true,
                 "enabledForDiskEncryption": false,
-                "enabledForTemplateDeployment": false,
+                "enabledForTemplateDeployment": true,
                 "enableSoftDelete": true,
                 "softDeleteRetentionInDays": 90,
                 "enableRbacAuthorization": false,
-                "vaultUri": "https://atlconfdemokv.vault.azure.net/",
+                "vaultUri": "[concat('https://', parameters('KeyvaultName'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
                 "publicNetworkAccess": "Disabled"
             }
@@ -104,14 +102,14 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-07-01",
-            "name": "[parameters('networkInterfaces_DemoKVPrivateEndpoint_nic_e40a965d_e523_4f5c_b76a_34b26f50ce08_name')]",
-            "location": "eastus",
+            "name": "[parameters('PrivateEndpointNetworkInterface')]",
+            "location": "[parameters('Location')]",
             "kind": "Regular",
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "privateEndpointIpConfig.f33f5441-eb23-4022-b138-acea59f8b882",
-                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_DemoKVPrivateEndpoint_nic_e40a965d_e523_4f5c_b76a_34b26f50ce08_name')), '/ipConfigurations/privateEndpointIpConfig.f33f5441-eb23-4022-b138-acea59f8b882')]",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('PrivateEndpointNetworkInterface')), '/ipConfigurations/privateEndpointIpConfig.f33f5441-eb23-4022-b138-acea59f8b882')]",
                         "etag": "W/\"5157c6d2-6ee2-42e9-bcc5-8cf43b23e2fc\"",
                         "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
                         "properties": {
@@ -119,7 +117,7 @@
                             "privateIPAddress": "10.0.0.4",
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[concat(parameters('virtualNetworks_Backend_externalid'), '/subnets/subnet-1')]"
+                                "id": "[concat(parameters('VirtualNetworkBackendResourceId'), '/subnets/subnet-1')]"
                             },
                             "primary": true,
                             "privateIPAddressVersion": "IPv4",
@@ -127,7 +125,7 @@
                                 "groupId": "vault",
                                 "requiredMemberName": "default",
                                 "fqdns": [
-                                    "atlconfdemokv.vault.azure.net"
+                                    "[concat(parameters('KeyvaultName'), '.vault.azure.net')]"
                                 ]
                             }
                         }
@@ -145,7 +143,7 @@
         {
             "type": "Microsoft.Network/privateDnsZones",
             "apiVersion": "2018-09-01",
-            "name": "[parameters('privateDnsZones_privatelink_vaultcore_azure_net_name')]",
+            "name": "[parameters('PrivateDNSZonePrivateLinkName')]",
             "location": "global",
             "properties": {
                 "maxNumberOfRecordSets": 25000,
@@ -160,9 +158,9 @@
         {
             "type": "Microsoft.Network/privateDnsZones/A",
             "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'), '/atlconfdemokv')]",
+            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/', parameters('KeyvaultName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'))]"
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
             ],
             "properties": {
                 "ttl": 3600,
@@ -176,9 +174,9 @@
         {
             "type": "Microsoft.Network/privateDnsZones/SOA",
             "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'), '/@')]",
+            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/@')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'))]"
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
             ],
             "properties": {
                 "ttl": 3600,
@@ -196,33 +194,33 @@
         {
             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
             "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'), '/rqd3lc2sjgs6i')]",
+            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/rqd3lc2sjgs6i')]",
             "location": "global",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZones_privatelink_vaultcore_azure_net_name'))]"
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
             ],
             "properties": {
                 "registrationEnabled": false,
                 "virtualNetwork": {
-                    "id": "[parameters('virtualNetworks_Backend_externalid')]"
+                    "id": "[parameters('VirtualNetworkBackendResourceId')]"
                 }
             }
         },
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2022-07-01",
-            "name": "[parameters('privateEndpoints_DemoKVPrivateEndpoint_name')]",
-            "location": "eastus",
+            "name": "[parameters('PrivateEndpointName')]",
+            "location": "[parameters('Location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_ATLConfDemoKV_name'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyvaultName'))]"
             ],
             "properties": {
                 "privateLinkServiceConnections": [
                     {
-                        "name": "[concat(parameters('privateEndpoints_DemoKVPrivateEndpoint_name'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d')]",
-                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_DemoKVPrivateEndpoint_name')), concat('/privateLinkServiceConnections/', parameters('privateEndpoints_DemoKVPrivateEndpoint_name'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d'))]",
+                        "name": "[concat(parameters('PrivateEndpointName'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d')]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('PrivateEndpointName')), concat('/privateLinkServiceConnections/', parameters('PrivateEndpointName'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d'))]",
                         "properties": {
-                            "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_ATLConfDemoKV_name'))]",
+                            "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyvaultName'))]",
                             "groupIds": [
                                 "vault"
                             ],
@@ -235,12 +233,12 @@
                 ],
                 "manualPrivateLinkServiceConnections": [],
                 "subnet": {
-                    "id": "[concat(parameters('virtualNetworks_Backend_externalid'), '/subnets/subnet-1')]"
+                    "id": "[concat(parameters('VirtualNetworkBackendResourceId'), '/subnets/subnet-1')]"
                 },
                 "ipConfigurations": [],
                 "customDnsConfigs": [
                     {
-                        "fqdn": "atlconfdemokv.vault.azure.net",
+                        "fqdn": "[concat(parameters('KeyvaultName'), '.vault.azure.net')]",
                         "ipAddresses": [
                             "10.0.0.4"
                         ]

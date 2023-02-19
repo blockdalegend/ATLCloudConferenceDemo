@@ -2,20 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vaults_ATLConfDemoKV_name": {
-            "value": null
+        "KeyvaultName": {
+            "value": "ATLConfDemoKV"
         },
-        "privateEndpoints_DemoKVPrivateEndpoint_name": {
-            "value": null
+        "Location": {
+            "value": "eastus"
         },
-        "privateDnsZones_privatelink_vaultcore_azure_net_name": {
-            "value": null
+        "PrivateEndpointName": {
+            "value": "DemoKVPrivateEndpoint"
         },
-        "networkInterfaces_DemoKVPrivateEndpoint_nic_e40a965d_e523_4f5c_b76a_34b26f50ce08_name": {
-            "value": null
+        "PrivateDNSZonePrivateLinkName": {
+            "value": "privatelink.vaultcore.azure.net"
         },
-        "virtualNetworks_Backend_externalid": {
-            "value": null
+        "PrivateEndpointNetworkInterface": {
+            "value": "DemoKVPrivateEndpoint.nic.e40a965d-e523-4f5c-b76a-34b26f50ce08"
+        },
+        "VirtualNetworkBackendResourceId": {
+            "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/Backend"
         }
     }
 }
