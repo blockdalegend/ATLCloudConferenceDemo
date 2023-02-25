@@ -7,18 +7,6 @@
         },
         "Location": {
             "value": "eastus"
-        },
-        "PrivateEndpointName": {
-            "value": "DemoKVPrivateEndpoint"
-        },
-        "PrivateDNSZonePrivateLinkName": {
-            "value": "privatelink.vaultcore.azure.net"
-        },
-        "PrivateEndpointNetworkInterface": {
-            "value": "DemoKVPrivateEndpoint.nic.e40a965d-e523-4f5c-b76a-34b26f50ce08"
-        },
-        "VirtualNetworkBackendResourceId": {
-            "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/Backend"
         }
     }
 }

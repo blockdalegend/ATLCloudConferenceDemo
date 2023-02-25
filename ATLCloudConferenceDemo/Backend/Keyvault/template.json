@@ -7,18 +7,6 @@
         },
         "Location": {
             "type": "String"
-        },
-        "PrivateEndpointName": {
-            "type": "String"
-        },
-        "PrivateDNSZonePrivateLinkName": {
-            "type": "String"
-        },
-        "PrivateEndpointNetworkInterface": {
-            "type": "String"
-        },
-        "VirtualNetworkBackendResourceId": {
-            "type": "String"
         }
     },
     "variables": {},
@@ -27,7 +15,7 @@
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2022-07-01",
             "name": "[parameters('KeyvaultName')]",
-            "location": "eastus",
+            "location": "[parameters('Location')]",
             "properties": {
                 "sku": {
                     "family": "A",
@@ -97,153 +85,6 @@
                 "vaultUri": "[concat('https://', parameters('KeyvaultName'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
                 "publicNetworkAccess": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2022-07-01",
-            "name": "[parameters('PrivateEndpointNetworkInterface')]",
-            "location": "[parameters('Location')]",
-            "kind": "Regular",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "privateEndpointIpConfig.f33f5441-eb23-4022-b138-acea59f8b882",
-                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('PrivateEndpointNetworkInterface')), '/ipConfigurations/privateEndpointIpConfig.f33f5441-eb23-4022-b138-acea59f8b882')]",
-                        "etag": "W/\"5157c6d2-6ee2-42e9-bcc5-8cf43b23e2fc\"",
-                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                        "properties": {
-                            "provisioningState": "Succeeded",
-                            "privateIPAddress": "10.0.0.4",
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[concat(parameters('VirtualNetworkBackendResourceId'), '/subnets/subnet-1')]"
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4",
-                            "privateLinkConnectionProperties": {
-                                "groupId": "vault",
-                                "requiredMemberName": "default",
-                                "fqdns": [
-                                    "[concat(parameters('KeyvaultName'), '.vault.azure.net')]"
-                                ]
-                            }
-                        }
-                    }
-                ],
-                "dnsSettings": {
-                    "dnsServers": []
-                },
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "disableTcpStateTracking": false,
-                "nicType": "Standard"
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones",
-            "apiVersion": "2018-09-01",
-            "name": "[parameters('PrivateDNSZonePrivateLinkName')]",
-            "location": "global",
-            "properties": {
-                "maxNumberOfRecordSets": 25000,
-                "maxNumberOfVirtualNetworkLinks": 1000,
-                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
-                "numberOfRecordSets": 2,
-                "numberOfVirtualNetworkLinks": 1,
-                "numberOfVirtualNetworkLinksWithRegistration": 0,
-                "provisioningState": "Succeeded"
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones/A",
-            "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/', parameters('KeyvaultName'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
-            ],
-            "properties": {
-                "ttl": 3600,
-                "aRecords": [
-                    {
-                        "ipv4Address": "10.0.0.4"
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones/SOA",
-            "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/@')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
-            ],
-            "properties": {
-                "ttl": 3600,
-                "soaRecord": {
-                    "email": "azureprivatedns-host.microsoft.com",
-                    "expireTime": 2419200,
-                    "host": "azureprivatedns.net",
-                    "minimumTtl": 10,
-                    "refreshTime": 3600,
-                    "retryTime": 300,
-                    "serialNumber": 1
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('PrivateDNSZonePrivateLinkName'), '/rqd3lc2sjgs6i')]",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', parameters('PrivateDNSZonePrivateLinkName'))]"
-            ],
-            "properties": {
-                "registrationEnabled": false,
-                "virtualNetwork": {
-                    "id": "[parameters('VirtualNetworkBackendResourceId')]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/privateEndpoints",
-            "apiVersion": "2022-07-01",
-            "name": "[parameters('PrivateEndpointName')]",
-            "location": "[parameters('Location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyvaultName'))]"
-            ],
-            "properties": {
-                "privateLinkServiceConnections": [
-                    {
-                        "name": "[concat(parameters('PrivateEndpointName'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d')]",
-                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('PrivateEndpointName')), concat('/privateLinkServiceConnections/', parameters('PrivateEndpointName'), '_0b2f24b2-74ef-4fcb-8fb1-ba56ea4d304d'))]",
-                        "properties": {
-                            "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyvaultName'))]",
-                            "groupIds": [
-                                "vault"
-                            ],
-                            "privateLinkServiceConnectionState": {
-                                "status": "Approved",
-                                "actionsRequired": "None"
-                            }
-                        }
-                    }
-                ],
-                "manualPrivateLinkServiceConnections": [],
-                "subnet": {
-                    "id": "[concat(parameters('VirtualNetworkBackendResourceId'), '/subnets/subnet-1')]"
-                },
-                "ipConfigurations": [],
-                "customDnsConfigs": [
-                    {
-                        "fqdn": "[concat(parameters('KeyvaultName'), '.vault.azure.net')]",
-                        "ipAddresses": [
-                            "10.0.0.4"
-                        ]
-                    }
-                ]
             }
         }
     ]

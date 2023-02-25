@@ -27,10 +27,10 @@
     <Content Include="azuredeploy.parameters.json" />
     <None Include="Backend\Keyvault\parameters.json" />
     <None Include="Backend\Keyvault\template.json" />
+    <None Include="Backend\ManagedIdentity\parameters.json" />
+    <None Include="Backend\ManagedIdentity\template.json" />
     <None Include="Backend\SQLServer\parameters.json" />
     <None Include="Backend\SQLServer\template.json" />
-    <None Include="Backend\VirtualNetwork\parameters.json" />
-    <None Include="Backend\VirtualNetwork\template.json" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
