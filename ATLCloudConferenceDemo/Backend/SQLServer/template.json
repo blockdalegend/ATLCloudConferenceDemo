@@ -18,21 +18,12 @@
         "type": "string"
       }
     },
-    "variables": {
-      "ManagedIdentityResourceId": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourcegroups/ATLCloudConferenceDemo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ATLConfDemoId"
-    },
     "resources": [
       {
         "type": "Microsoft.Sql/servers",
         "apiVersion": "2022-05-01-preview",
         "name": "[parameters('server_name')]",
         "location": "[parameters('location')]",
-        "identity": {
-          "type": "UserAssigned",
-          "userAssignedIdentities": {
-            "[variables('ManagedIdentityResourceId')]":{}
-          }
-        },
         "kind": "v12.0",
         "properties": {
           "administratorLogin": "[concat(parameters('server_name'), 'admin')]",
@@ -94,8 +85,12 @@
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[reference(parameters('server_name'), '2022-05-01-preview', 'Full').administratorLogin]"
-            }
+                "value": "[reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.administratorLogin]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+            ]
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
@@ -107,8 +102,12 @@
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[concat('Server=tcp:',reference(parameters('server_name'), '2022-05-01-preview', 'Full').fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('db_name'),';Persist Security Info=False;User ID=',reference(parameters('server_name'), '2022-05-01-preview', 'Full').administratorLogin,';Password=',reference(parameters('server_name'), '2022-05-01-preview', 'Full').administratorLoginPassword,';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
-            }
+                "value": "[concat('Server=tcp:',reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('db_name'),';Persist Security Info=False;User ID=',reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.administratorLogin,';Password=',parameters('adminpassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+            ]
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
@@ -120,8 +119,12 @@
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[reference(parameters('server_name'), '2022-05-01-preview', 'Full').administratorLoginPassword]"
-            }
+                "value": "[parameters('adminpassword')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+            ]
         }
     ]
 }

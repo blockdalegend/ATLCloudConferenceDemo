@@ -7,6 +7,9 @@
         },
         "Location": {
             "type": "String"
+        },
+        "ManagedIdentityName": {
+            "type": "String"
         }
     },
     "variables": {},
@@ -21,7 +24,7 @@
                     "family": "A",
                     "name": "Standard"
                 },
-                "tenantId": "f79a4e9a-ffbe-4bc8-8e94-7e894c6fc3d2",
+                "tenantId": "[subscription().tenantId]",
                 "networkAcls": {
                     "bypass": "AzureServices",
                     "defaultAction": "Deny",
@@ -30,48 +33,14 @@
                 },
                 "accessPolicies": [
                     {
-                        "tenantId": "f79a4e9a-ffbe-4bc8-8e94-7e894c6fc3d2",
-                        "objectId": "d5a79447-7ea7-40fd-b20b-c037681218f8",
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
                         "permissions": {
-                            "keys": [
-                                "Get",
-                                "List",
-                                "Update",
-                                "Create",
-                                "Import",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore",
-                                "GetRotationPolicy",
-                                "SetRotationPolicy",
-                                "Rotate"
-                            ],
+                            "certificates": [],
+                            "keys": [],
                             "secrets": [
-                                "Get",
-                                "List",
-                                "Set",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore"
-                            ],
-                            "certificates": [
-                                "Get",
-                                "List",
-                                "Update",
-                                "Create",
-                                "Import",
-                                "Delete",
-                                "Recover",
-                                "Backup",
-                                "Restore",
-                                "ManageContacts",
-                                "ManageIssuers",
-                                "GetIssuers",
-                                "ListIssuers",
-                                "SetIssuers",
-                                "DeleteIssuers"
+                                "get",
+                                "list"
                             ]
                         }
                     }
@@ -84,7 +53,7 @@
                 "enableRbacAuthorization": false,
                 "vaultUri": "[concat('https://', parameters('KeyvaultName'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
-                "publicNetworkAccess": "Disabled"
+                "publicNetworkAccess": "Enabled"
             }
         }
     ]
