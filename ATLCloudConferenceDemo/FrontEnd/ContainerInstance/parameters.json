@@ -16,6 +16,9 @@
     },
     "location": {
       "value": "eastus"
+    },
+    "ManagedIdentityName": {
+        "value": "ATLConfDemoId"
     }
   }
 }
