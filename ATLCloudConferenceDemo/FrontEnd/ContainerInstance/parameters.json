@@ -1,24 +1,21 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
   "parameters": {
-    "ContainerGroupsName": {
-      "value": "demofrontend"
-    },
-    "DockerImageName": {
-      "value": "chall88/demofrontend:latest"
-    },
-    "DNSLabel": {
+    "sitename": {
       "value": "atlconferencedemo"
     },
-    "KVName": {
-      "value": "AtlConfDemoKV"
+    "serverfarmname": {
+      "value": "ASP-ATLCloudConferenceDemo-b5a9"
     },
-    "location": {
-      "value": "eastus"
+    "virtualnetworkresourceid": {
+      "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
     },
-    "ManagedIdentityName": {
-        "value": "ATLConfDemoId"
+    "managedidentityresourceid":{
+      "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourcegroups/ATLCloudConferenceDemo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ATLConfDemoId"
+    },
+    "dockerimagename": {
+        "value": "chall88/demofrontend:latest"
     }
   }
 }
