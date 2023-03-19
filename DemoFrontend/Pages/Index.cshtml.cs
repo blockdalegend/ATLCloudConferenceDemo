@@ -18,12 +18,12 @@ namespace DemoFrontend.Pages
         }
 
         public void OnGet()
-        { 
-           this.Students = GetStudentsFromDB();
+        {
+            this.Students = GetStudentsFromDB();
         }
 
         private List<Student> GetStudentsFromDB()
-        {   
+        {
             var studentsList = new List<Student>();
             using (SqlConnection sqlConnection = new SqlConnection(GetKeyVaultSecret("SQLDBConnString").Value))
             {
