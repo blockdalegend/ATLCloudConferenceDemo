@@ -2,45 +2,209 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "server_name": {
-        "type": "String"
-      },
-      "location": {
-        "type": "string"
-      },
-      "adminpassword": {
-        "type": "securestring"
-      },
-      "KeyVaultName": {
-        "type": "string"
-      },
-      "db_name": {
-        "type": "string"
-      }
+        "sqlservername": {
+            "type": "String"
+        },
+        "sqldbname": {
+            "type": "String"
+        },
+        "privateEndpoints_SQLEndpoint_name": {
+            "type": "String"
+        },
+        "keyvaultname": {
+            "type": "String"
+        },
+        "networkinterfacename": {
+            "type": "String"
+        },
+        "privatelinkdnszonesname": {
+            "type": "String"
+        },
+        "virtualnetworksresourceid": {
+            "type": "String"
+        },
+        "managedidentityresourceid": {
+            "type": "String"
+        },
+        "newGuid": {
+            "type": "string",
+            "defaultValue": "[newGuid()]"
+        }
+    },
+    "variables": {
+        "adminpassword": "[concat(uniqueString(guid(resourceGroup().id, deployment().name)), parameters('newGuid'), 'Tg2%')]"
     },
     "resources": [
-      {
-        "type": "Microsoft.Sql/servers",
-        "apiVersion": "2022-05-01-preview",
-        "name": "[parameters('server_name')]",
-        "location": "[parameters('location')]",
-        "kind": "v12.0",
-        "properties": {
-          "administratorLogin": "[concat(parameters('server_name'), 'admin')]",
-          "administratorLoginPassword": "[parameters('adminpassword')]",
-          "version": "12.0",
-          "minimalTlsVersion": "1.2",
-          "publicNetworkAccess": "Enabled",
-          "restrictOutboundNetworkAccess": "Disabled"
-        }
-      },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('networkinterfacename')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "sqlprivateendpointipconfig",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkinterfacename')), '/ipConfigurations/sqlprivateendpointipconfig')]",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.2.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(parameters('virtualnetworksresourceid'), '/subnets/Subnet-3')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4",
+                            "privateLinkConnectionProperties": {
+                                "groupId": "sqlServer",
+                                "requiredMemberName": "sqlServer",
+                                "fqdns": [
+                                    "[concat(parameters('sqlservername'), '.database.windows.net')]"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('privatelinkdnszonesname')]",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 2,
+                "numberOfVirtualNetworkLinks": 1,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[parameters('sqlservername')]",
+            "location": "[resourceGroup().location]",
+            "kind": "v12.0",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[parameters('managedidentityresourceid')]": {}
+                }
+            },
+            "properties": {
+                "administratorLogin": "[concat(parameters('sqlservername'), 'admin')]",
+
+                "version": "12.0",
+                "minimalTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled",
+                "primaryUserAssignedIdentityId": "[parameters('managedidentityresourceid')]",
+                "restrictOutboundNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/A",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatelinkdnszonesname'), '/', parameters('sqlservername'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
+            ],
+            "properties": {
+                "ttl": 10,
+                "aRecords": [
+                    {
+                        "ipv4Address": "10.0.2.4"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatelinkdnszonesname'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatelinkdnszonesname'), '/we7g5e376t5mi')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
+            ],
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[parameters('virtualnetworksresourceid')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('privateEndpoints_SQLEndpoint_name')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]"
+            ],
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateEndpoints_SQLEndpoint_name')]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name')), concat('/privateLinkServiceConnections/', parameters('privateEndpoints_SQLEndpoint_name')))]",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
+                            "groupIds": [
+                                "sqlServer"
+                            ],
+                            "privateLinkServiceConnectionState": {
+                                "status": "Approved",
+                                "description": "Auto-approved",
+                                "actionsRequired": "None"
+                            }
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "customNetworkInterfaceName": "[concat(parameters('privateEndpoints_SQLEndpoint_name'), '-nic')]",
+                "subnet": {
+                    "id": "[concat(parameters('virtualnetworksresourceid'), '/subnets/Subnet-3')]"
+                },
+                "ipConfigurations": [],
+                "customDnsConfigs": []
+            }
+        },
         {
             "type": "Microsoft.Sql/servers/connectionPolicies",
-            "apiVersion": "2022-05-01-preview",
-            "name": "[concat(parameters('server_name'), '/default')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('sqlservername'), '/default')]",
+            "location": "eastus",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]"
             ],
             "properties": {
                 "connectionType": "Default"
@@ -48,11 +212,11 @@
         },
         {
             "type": "Microsoft.Sql/servers/databases",
-            "apiVersion": "2022-05-01-preview",
-            "name": "[concat(parameters('server_name'), '/', parameters('db_name'))]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('sqlservername'), '/', parameters('sqldbname'))]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]"
             ],
             "sku": {
                 "name": "GP_S_Gen5",
@@ -72,58 +236,96 @@
                 "minCapacity": 1,
                 "maintenanceConfigurationId": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
                 "isLedgerOn": false,
-                "preferredEnclaveType": "Default"
+                "preferredEnclaveType": "Default",
+                "availabilityZone": "NoPreference"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2022-07-01",
+            "name": "[concat(parameters('privateEndpoints_SQLEndpoint_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name'))]",
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-database-windows-net",
+                        "properties": {
+                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/privateEndpointConnections",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('sqlservername'), '/SQLEndpoint')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name'))]"
+            ],
+            "properties": {
+                "privateEndpoint": {
+                    "id": "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name'))]"
+                },
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-approved"
+                }
             }
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "apiVersion": "2022-11-01",
-            "name": "[concat(parameters('KeyVaultName'), '/SQLDBAdmin')]",
-            "location": "[parameters('location')]",
+            "name": "[concat(parameters('keyvaultname'), '/SQLDBAdmin')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "attributes": {
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.administratorLogin]"
+                "value": "[reference(parameters('sqlservername'), '2022-05-01-preview', 'Full').properties.administratorLogin]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlservername'), parameters('sqldbname'))]"
             ]
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "apiVersion": "2022-11-01",
-            "name": "[concat(parameters('KeyVaultName'), '/SQLDBConnString')]",
-            "location": "[parameters('location')]",
+            "name": "[concat(parameters('keyvaultname'), '/SQLDBConnString')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "attributes": {
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[concat('Server=tcp:',reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('db_name'),';Persist Security Info=False;User ID=',reference(parameters('server_name'), '2022-05-01-preview', 'Full').properties.administratorLogin,';Password=',parameters('adminpassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+                "value": "[concat('Server=tcp:',reference(parameters('sqlservername'), '2022-05-01-preview', 'Full').properties.fullyQualifiedDomainName,',1433;Initial Catalog=',parameters('sqldbname'),';Persist Security Info=False;User ID=',reference(parameters('sqlservername'), '2022-05-01-preview', 'Full').properties.administratorLogin,';Password=',variables('adminpassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlservername'), parameters('sqldbname'))]"
             ]
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "apiVersion": "2022-11-01",
             "name": "[concat(parameters('KeyVaultName'), '/SQLDBPassword')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "attributes": {
                     "enabled": true
                 },
                 "contentType": "string",
-                "value": "[parameters('adminpassword')]"
+                "value": "[variables('adminpassword')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('server_name'))]",
-                "[resourceId('Microsoft.Sql/servers/databases', parameters('server_name'), parameters('db_name'))]"
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlservername'), parameters('sqldbname'))]"
             ]
         }
     ]

@@ -2,29 +2,38 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "KeyvaultName": {
+        "keyvaultname": {
             "type": "String"
         },
-        "Location": {
+        "privateendpointname": {
             "type": "String"
         },
-        "ManagedIdentityName": {
+        "privatednszonename": {
             "type": "String"
+        },
+        "kvendpointnicname": {
+            "type": "String"
+        },
+        "virtualnetworkresourceid": {
+            "type": "String"
+        },
+        "managedIdentityName": {
+            "type": "string"
         }
     },
     "variables": {},
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "apiVersion": "2022-07-01",
-            "name": "[parameters('KeyvaultName')]",
-            "location": "[parameters('Location')]",
+            "apiVersion": "2022-11-01",
+            "name": "[parameters('keyvaultname')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
                     "family": "A",
                     "name": "Standard"
                 },
-                "tenantId": "[subscription().tenantId]",
+                "tenantId": "f79a4e9a-ffbe-4bc8-8e94-7e894c6fc3d2",
                 "networkAcls": {
                     "bypass": "AzureServices",
                     "defaultAction": "Deny",
@@ -36,9 +45,12 @@
                         "tenantId": "[subscription().tenantId]",
                         "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
                         "permissions": {
-                            "certificates": [],
                             "keys": [],
                             "secrets": [
+                                "get",
+                                "list"
+                            ],
+                            "certificates": [
                                 "get",
                                 "list"
                             ]
@@ -51,9 +63,172 @@
                 "enableSoftDelete": true,
                 "softDeleteRetentionInDays": 90,
                 "enableRbacAuthorization": false,
-                "vaultUri": "[concat('https://', parameters('KeyvaultName'), '.vault.azure.net/')]",
+                "vaultUri": "[concat('https://', parameters('keyvaultname'), '.vault.azure.net/')]",
                 "provisioningState": "Succeeded",
-                "publicNetworkAccess": "Enabled"
+                "publicNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('kvendpointnicname')]",
+            "location": "[resourceGroup().location]",
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "privateEndpointIpConfig",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('kvendpointnicname')), '/ipConfigurations/privateEndpointIpConfig')]",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.1.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-2')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4",
+                            "privateLinkConnectionProperties": {
+                                "groupId": "vault",
+                                "requiredMemberName": "default",
+                                "fqdns": [
+                                    "[concat(parameters('keyvaultname'),'.vault.azure.net')]"
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "[parameters('privatednszonename')]",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 2,
+                "numberOfVirtualNetworkLinks": 1,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/privateEndpointConnections",
+            "apiVersion": "2022-11-01",
+            "name": "[concat(parameters('keyvaultname'), '/', parameters('kvendpointnicname'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]"
+            ],
+            "properties": {
+                "provisioningState": "Succeeded",
+                "privateEndpoint": {},
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "actionsRequired": "None"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/A",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatednszonename'), '/', parameters('keyvaultname'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatednszonename'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "aRecords": [
+                    {
+                        "ipv4Address": "10.0.1.4"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatednszonename'), '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatednszonename'))]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2018-09-01",
+            "name": "[concat(parameters('privatednszonename'), '/we7g5e376t5mi')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatednszonename'))]"
+            ],
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[parameters('virtualnetworkresourceid')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2022-07-01",
+            "name": "[parameters('privateendpointname')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]"
+            ],
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateendpointname')]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateendpointname')), '/privateLinkServiceConnections/', parameters('privateendpointname'))]",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]",
+                            "groupIds": [
+                                "vault"
+                            ],
+                            "privateLinkServiceConnectionState": {
+                                "status": "Approved",
+                                "actionsRequired": "None"
+                            }
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "subnet": {
+                    "id": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-2')]"
+                },
+                "ipConfigurations": [],
+                "customDnsConfigs": [
+                    {
+                        "fqdn": "[concat(parameters('keyvaultname'),'.vault.azure.net')]",
+                        "ipAddresses": [
+                            "10.0.1.4"
+                        ]
+                    }
+                ]
             }
         }
     ]
