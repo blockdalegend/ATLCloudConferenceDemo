@@ -2,14 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "KeyvaultName": {
-            "value": "ATLConfDemoKV"
+        "keyvaultname": {
+            "value": "atlconferencedemo"
         },
-        "Location": {
-            "value": "eastus"
+        "privateendpointname": {
+            "value": "KVEndpoint"
         },
-        "ManagedIdentityName": {
-            "value": "ATLConfDemoId" 
+        "privatednszonename": {
+            "value": "privatelink.vaultcore.azure.net"
+        },
+        "kvendpointnicname": {
+            "value": "KVEndpoint.nic.9b3ff5af-42c0-4d2a-8c12-2c6e8692e7e1"
+        },
+        "virtualnetworkresourceid": {
+            "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
+        },
+        "managedIdentityName": {
+            "value": "ATLConfDemoId"
         }
     }
 }

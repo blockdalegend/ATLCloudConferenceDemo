@@ -1,21 +1,30 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "server_name": {
-        "value": "atlconfdemo"
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "sqlservername": {
+          "value": "atlconfdemo"
       },
-      "location":{
-        "value": "eastus"
-      },
-      "adminpassword": {
-          "value": "" 
-      },
-      "KeyVaultName": {
-          "value": "ATLConfDemoKV" 
-      },
-      "db_name": {
+      "sqldbname": {
           "value": "confdemodb"
+      },
+      "privateEndpoints_SQLEndpoint_name": {
+          "value": "SQLEndpoint"
+      },
+      "networkinterfacename": {
+          "value": "SQLEndpoint-nic"
+      },
+      "privatelinkdnszonesname": {
+          "value": "privatelink.database.windows.net"
+      },
+      "virtualnetworksresourceid": {
+          "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
+      },
+      "managedidentityresourceid": {
+          "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ATLConfDemoId"
+      },
+      "keyvaultname": {
+          "value": "atlconferencedemo"
       }
-    }
+  }
 }
