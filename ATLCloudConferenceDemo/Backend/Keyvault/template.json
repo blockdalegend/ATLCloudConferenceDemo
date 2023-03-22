@@ -72,46 +72,6 @@
             }
         },
         {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2022-07-01",
-            "name": "[parameters('kvendpointnicname')]",
-            "location": "[resourceGroup().location]",
-            "kind": "Regular",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "privateEndpointIpConfig",
-                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('kvendpointnicname')), '/ipConfigurations/privateEndpointIpConfig')]",
-                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                        "properties": {
-                            "provisioningState": "Succeeded",
-                            "privateIPAddress": "10.0.1.4",
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-2')]"
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4",
-                            "privateLinkConnectionProperties": {
-                                "groupId": "vault",
-                                "requiredMemberName": "default",
-                                "fqdns": [
-                                    "[concat(parameters('keyvaultname'),'.vault.azure.net')]"
-                                ]
-                            }
-                        }
-                    }
-                ],
-                "dnsSettings": {
-                    "dnsServers": []
-                },
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "disableTcpStateTracking": false,
-                "nicType": "Standard"
-            }
-        },
-        {
             "type": "Microsoft.Network/privateDnsZones",
             "apiVersion": "2018-09-01",
             "name": "[parameters('privatednszonename')]",
@@ -129,7 +89,7 @@
         {
             "type": "Microsoft.KeyVault/vaults/privateEndpointConnections",
             "apiVersion": "2022-11-01",
-            "name": "[concat(parameters('keyvaultname'), '/', parameters('kvendpointnicname'))]",
+            "name": "[concat(parameters('keyvaultname'), '/', parameters('privateendpointnameconnectionname'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]"
@@ -205,7 +165,7 @@
             "properties": {
                 "privateLinkServiceConnections": [
                     {
-                        "name": "[parameters('privateendpointname')]",
+                        "name": "[parameters('privateendpointnameconnectionname')]",
                         "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateendpointname')), '/privateLinkServiceConnections/', parameters('privateendpointnameconnectionname'))]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]",
