@@ -19,6 +19,9 @@
         },
         "managedIdentityName": {
             "type": "string"
+        },
+        "privateendpointnameconnectionname": {
+            "type": "string"
         }
     },
     "variables": {},
@@ -203,7 +206,7 @@
                 "privateLinkServiceConnections": [
                     {
                         "name": "[parameters('privateendpointname')]",
-                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateendpointname')), '/privateLinkServiceConnections/', parameters('privateendpointname'))]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateendpointname')), '/privateLinkServiceConnections/', parameters('privateendpointnameconnectionname'))]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]",
                             "groupIds": [
