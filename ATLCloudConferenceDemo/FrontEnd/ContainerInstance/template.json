@@ -11,10 +11,10 @@
     "virtualnetworkresourceid": {
       "type": "String"
     },
-    "managedidentityresourceid": {
-      "type": "String"
-    },
     "dockerimagename": {
+      "type": "string"
+    },
+    "managedIdentityName": {
       "type": "string"
     }
   },
@@ -59,7 +59,7 @@
       "identity": {
         "type": "UserAssigned",
         "userAssignedIdentities": {
-          "[parameters('managedidentityresourceid')]": {}
+          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]": {}
         }
       },
       "properties": {
@@ -105,7 +105,7 @@
         "publicNetworkAccess": "Enabled",
         "storageAccountRequired": false,
         "virtualNetworkSubnetId": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-1')]",
-        "keyVaultReferenceIdentity": "UserAssigned"
+        "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
       }
     },
     {
