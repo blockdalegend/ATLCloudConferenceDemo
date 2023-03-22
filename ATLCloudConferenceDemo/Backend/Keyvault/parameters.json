@@ -6,7 +6,7 @@
             "value": "atlconferencedemo"
         },
         "privateendpointname": {
-            "value": "KVEndpoint"
+            "value": "KVEndpoint_07f21cac-6e77-4a76-a2a6-0ece53439027"
         },
         "privatednszonename": {
             "value": "privatelink.vaultcore.azure.net"
