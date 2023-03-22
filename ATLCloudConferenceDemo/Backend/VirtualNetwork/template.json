@@ -76,11 +76,7 @@
             "apiVersion": "2022-07-01",
             "name": "[parameters('virtualnetworkname')]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualnetworkname'), 'Subnet-2')]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualnetworkname'), 'Subnet-3')]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualnetworkname'), 'Subnet-1')]"
-            ],
+            "dependsOn": [],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
