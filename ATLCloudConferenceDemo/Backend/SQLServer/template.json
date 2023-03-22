@@ -14,9 +14,6 @@
         "keyvaultname": {
             "type": "String"
         },
-        "networkinterfacename": {
-            "type": "String"
-        },
         "privatelinkdnszonesname": {
             "type": "String"
         },
@@ -29,52 +26,15 @@
         "newGuid": {
             "type": "string",
             "defaultValue": "[newGuid()]"
+        },
+        "endpointconnectionname": {
+            "type": "string"
         }
     },
     "variables": {
         "adminpassword": "[concat(uniqueString(guid(resourceGroup().id, deployment().name)), parameters('newGuid'), 'Tg2%')]"
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2022-07-01",
-            "name": "[parameters('networkinterfacename')]",
-            "location": "[resourceGroup().location]",
-            "kind": "Regular",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "sqlprivateendpointipconfig",
-                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkinterfacename')), '/ipConfigurations/sqlprivateendpointipconfig')]",
-                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-                        "properties": {
-                            "provisioningState": "Succeeded",
-                            "privateIPAddress": "10.0.2.4",
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[concat(parameters('virtualnetworksresourceid'), '/subnets/Subnet-3')]"
-                            },
-                            "primary": true,
-                            "privateIPAddressVersion": "IPv4",
-                            "privateLinkConnectionProperties": {
-                                "groupId": "sqlServer",
-                                "requiredMemberName": "sqlServer",
-                                "fqdns": [
-                                    "[concat(parameters('sqlservername'), '.database.windows.net')]"
-                                ]
-                            }
-                        }
-                    }
-                ],
-                "dnsSettings": {
-                    "dnsServers": []
-                },
-                "enableAcceleratedNetworking": false,
-                "enableIPForwarding": false,
-                "disableTcpStateTracking": false,
-                "nicType": "Standard"
-            }
-        },
         {
             "type": "Microsoft.Network/privateDnsZones",
             "apiVersion": "2018-09-01",
@@ -115,7 +75,7 @@
         {
             "type": "Microsoft.Network/privateDnsZones/A",
             "apiVersion": "2018-09-01",
-            "name": "[concat(parameters('privatelinkdnszonesname'), '/', parameters('sqlservername'))]",
+            "name": "[concat(parameters('privatelinkdnszonesname'), '/', parameters('sqlservername'),'A')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
             ],
@@ -236,8 +196,7 @@
                 "minCapacity": 1,
                 "maintenanceConfigurationId": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
                 "isLedgerOn": false,
-                "preferredEnclaveType": "Default",
-                "availabilityZone": "NoPreference"
+                "preferredEnclaveType": "Default"
             }
         },
         {
@@ -262,7 +221,7 @@
         {
             "type": "Microsoft.Sql/servers/privateEndpointConnections",
             "apiVersion": "2022-08-01-preview",
-            "name": "[concat(parameters('sqlservername'), '/SQLEndpoint')]",
+            "name": "[concat(parameters('sqlservername'), '/', parameters('endpointconnectionname'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
                 "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name'))]"

@@ -11,9 +11,6 @@
       "privateEndpoints_SQLEndpoint_name": {
           "value": "SQLEndpoint"
       },
-      "networkinterfacename": {
-          "value": "SQLEndpoint-nic"
-      },
       "privatelinkdnszonesname": {
           "value": "privatelink.database.windows.net"
       },
@@ -25,6 +22,9 @@
       },
       "keyvaultname": {
           "value": "atlconferencedemo"
+      },
+      "endpointconnectionname": {
+          "value": "SQLEndpoint-129cbd65-2785-46fb-b1e9-00221d23577f"
       }
   }
 }
