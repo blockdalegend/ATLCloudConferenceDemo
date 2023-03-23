@@ -92,7 +92,8 @@
             "name": "[concat(parameters('keyvaultname'), '/', parameters('privateendpointnameconnectionname'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultname'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateendpointname'))]"
             ],
             "properties": {
                 "provisioningState": "Succeeded",
