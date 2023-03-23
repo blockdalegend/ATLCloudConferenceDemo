@@ -16,6 +16,9 @@
     },
     "managedIdentityName": {
       "type": "string"
+    },
+    "keyvaultname": {
+      "type": "string"
     }
   },
   "variables": {},
@@ -239,6 +242,18 @@
       "properties": {
         "vnetResourceId": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-1')]",
         "isSwift": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "appsettings",
+      "kind": "string",
+      "properties": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
+        "MSI_ENDPOINT": "http://169.254.169.254/",
+        "KEY_VAULT_NAME": "[parameters('keyvaultname')]"
       }
     }
   ]

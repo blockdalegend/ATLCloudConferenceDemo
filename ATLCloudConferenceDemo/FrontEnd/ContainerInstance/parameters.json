@@ -16,6 +16,9 @@
     },
     "managedIdentityName": {
         "value": "ATLConfDemoId"
+    },
+    "keyvaultname":{
+      "value": "atlconferencedemo"
     }
   }
 }
