@@ -144,6 +144,16 @@
         "[resourceId('Microsoft.Web/sites', parameters('sitename'))]"
       ],
       "properties": {
+        "siteConfig": {
+          "appSettings": [
+            {
+              "ASPNETCORE_ENVIRONMENT": "Development",
+              "AZURE_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
+              "MSI_ENDPOINT": "http://169.254.169.254/",
+              "KEY_VAULT_NAME": "[parameters('keyvaultname')]"
+            }
+          ]
+        },
         "numberOfWorkers": 1,
         "defaultDocuments": [
           "Default.htm",
@@ -242,18 +252,6 @@
       "properties": {
         "vnetResourceId": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-1')]",
         "isSwift": true
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/config",
-      "apiVersion": "2022-03-01",
-      "name": "appsettings",
-      "kind": "string",
-      "properties": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "AZURE_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
-        "MSI_ENDPOINT": "http://169.254.169.254/",
-        "KEY_VAULT_NAME": "[parameters('keyvaultname')]"
       }
     }
   ]
