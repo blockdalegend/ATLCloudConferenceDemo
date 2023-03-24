@@ -11,9 +11,6 @@
         "privatednszonename": {
             "type": "String"
         },
-        "kvendpointnicname": {
-            "type": "String"
-        },
         "virtualnetworkresourceid": {
             "type": "String"
         },
@@ -151,7 +148,7 @@
             "properties": {
                 "registrationEnabled": false,
                 "virtualNetwork": {
-                    "id": "[parameters('virtualnetworkresourceid')]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualnetworkresourceid'))]"
                 }
             }
         },

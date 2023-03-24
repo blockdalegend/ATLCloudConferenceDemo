@@ -8,8 +8,8 @@
     "serverfarmname": {
       "value": "ASP-ATLCloudConferenceDemo-b5a9"
     },
-    "virtualnetworkresourceid": {
-      "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
+    "virtualnetworkname": {
+      "value": "FrontEnd"
     },
     "dockerimagename": {
         "value": "chall88/demofrontend:latest"

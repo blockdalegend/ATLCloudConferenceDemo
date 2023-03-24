@@ -8,7 +8,7 @@
     "serverfarmname": {
       "type": "String"
     },
-    "virtualnetworkresourceid": {
+    "virtualnetworkname": {
       "type": "String"
     },
     "dockerimagename": {
@@ -107,7 +107,7 @@
         "redundancyMode": "None",
         "publicNetworkAccess": "Enabled",
         "storageAccountRequired": false,
-        "virtualNetworkSubnetId": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-1')]",
+        "virtualNetworkSubnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualnetworkname')), '/subnets/Subnet-1')]",
         "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
       }
     },
@@ -250,7 +250,7 @@
         "[resourceId('Microsoft.Web/sites', parameters('sitename'))]"
       ],
       "properties": {
-        "vnetResourceId": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-1')]",
+        "vnetResourceId": "[concat(parameters('virtualnetworkname'), '/subnets/Subnet-1')]",
         "isSwift": true
       }
     }

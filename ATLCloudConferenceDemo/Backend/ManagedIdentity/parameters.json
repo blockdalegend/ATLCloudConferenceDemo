@@ -4,9 +4,6 @@
   "parameters": {
     "name": {
       "value": "ATLConfDemoId"
-    },
-    "location": {
-      "value": "eastus"
     }
   }
 }

@@ -11,17 +11,14 @@
         "privatednszonename": {
             "value": "privatelink.vaultcore.azure.net"
         },
-        "kvendpointnicname": {
-            "value": "KVEndpoint.nic.9b3ff5af-42c0-4d2a-8c12-2c6e8692e7e1"
-        },
         "virtualnetworkresourceid": {
-            "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
+            "value": "FrontEnd"
         },
         "managedIdentityName": {
             "value": "ATLConfDemoId"
         },
         "privateendpointnameconnectionname":{
-            "value": "KVEndpoint_07f21cac-6e77-4a76-a2a6-0ece53439027"
+            "value": "KVEndpointConnection"
         }
     }
 }

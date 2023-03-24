@@ -14,11 +14,11 @@
       "privatelinkdnszonesname": {
           "value": "privatelink.database.windows.net"
       },
-      "virtualnetworksresourceid": {
-          "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.Network/virtualNetworks/FrontEnd"
+      "virtualnetworkname": {
+          "value": "FrontEnd"
       },
-      "managedidentityresourceid": {
-          "value": "/subscriptions/463f0dcf-6d32-417d-9ce1-adf76e1c6dd9/resourceGroups/ATLCloudConferenceDemo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ATLConfDemoId"
+      "managedidentityname": {
+          "value": "ATLConfDemoId"
       },
       "keyvaultname": {
           "value": "atlconferencedemo"

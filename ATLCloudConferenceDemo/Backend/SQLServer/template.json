@@ -17,10 +17,10 @@
         "privatelinkdnszonesname": {
             "type": "String"
         },
-        "virtualnetworksresourceid": {
+        "virtualnetworkname": {
             "type": "String"
         },
-        "managedidentityresourceid": {
+        "managedidentityname": {
             "type": "String"
         },
         "newGuid": {
@@ -56,7 +56,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "[parameters('managedidentityresourceid')]": {}
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',parameters('managedidentityname'))]": {}
                 }
             },
             "properties": {
@@ -65,7 +65,7 @@
                 "version": "12.0",
                 "minimalTlsVersion": "1.2",
                 "publicNetworkAccess": "Enabled",
-                "primaryUserAssignedIdentityId": "[parameters('managedidentityresourceid')]",
+                "primaryUserAssignedIdentityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',parameters('managedidentityname'))]",
                 "restrictOutboundNetworkAccess": "Disabled"
             }
         },
@@ -116,7 +116,7 @@
             "properties": {
                 "registrationEnabled": false,
                 "virtualNetwork": {
-                    "id": "[parameters('virtualnetworksresourceid')]"
+                    "id": "[parameters('virtualnetworkname')]"
                 }
             }
         },
@@ -149,7 +149,7 @@
                 "manualPrivateLinkServiceConnections": [],
                 "customNetworkInterfaceName": "[concat(parameters('privateEndpoints_SQLEndpoint_name'), '-nic')]",
                 "subnet": {
-                    "id": "[concat(parameters('virtualnetworksresourceid'), '/subnets/Subnet-3')]"
+                    "id": "[concat(resourceid('Microsoft.Network/virtualNetworks', parameters('virtualnetworkname')), '/subnets/Subnet-3')]"
                 },
                 "ipConfigurations": [],
                 "customDnsConfigs": []

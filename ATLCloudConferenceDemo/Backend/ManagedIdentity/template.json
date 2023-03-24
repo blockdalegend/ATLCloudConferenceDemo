@@ -4,16 +4,13 @@
   "parameters": {
     "name": {
       "type": "string"
-    },
-    "location": {
-      "type": "string"
     }
   },
   "resources": [
     {
       "apiVersion": "2018-11-30",
       "name": "[parameters('name')]",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "properties": {}
     }
