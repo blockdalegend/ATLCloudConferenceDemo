@@ -116,7 +116,7 @@
             "properties": {
                 "registrationEnabled": false,
                 "virtualNetwork": {
-                    "id": "[parameters('virtualnetworkname')]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualnetworkname'))]"
                 }
             }
         },
