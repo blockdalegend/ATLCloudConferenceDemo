@@ -101,7 +101,7 @@
             },
             {
               "name":"AZURE_CLIENT_ID",
-              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]"
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.clientId]"
             },
             {
               "name": "MSI_ENDPOINT",
@@ -151,109 +151,6 @@
       ],
       "properties": {
         "allow": true
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/config",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(parameters('sitename'), '/web')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('sitename'))]"
-      ],
-      "properties": {
-        "siteConfig": {
-          "appSettings": [
-            {
-              "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Development"
-            },
-            {
-              "name":"AZURE_CLIENT_ID",
-              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]"
-            },
-            {
-              "name": "MSI_ENDPOINT",
-              "value": "http://169.254.169.254/"
-            },
-            {
-              "name": "KEY_VAULT_NAME",
-              "value": "[parameters('keyvaultname')]"
-            }
-          ]
-        },
-        "numberOfWorkers": 1,
-        "defaultDocuments": [
-          "Default.htm",
-          "Default.html",
-          "Default.asp",
-          "index.htm",
-          "index.html",
-          "iisstart.htm",
-          "default.aspx",
-          "index.php",
-          "hostingstart.html"
-        ],
-        "netFrameworkVersion": "v4.0",
-        "linuxFxVersion": "[concat('DOCKER|',parameters('dockerimagename'))]",
-        "requestTracingEnabled": false,
-        "remoteDebuggingEnabled": false,
-        "remoteDebuggingVersion": "VS2019",
-        "httpLoggingEnabled": false,
-        "acrUseManagedIdentityCreds": false,
-        "logsDirectorySizeLimit": 35,
-        "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "[concat('$', parameters('sitename'))]",
-        "scmType": "None",
-        "use32BitWorkerProcess": true,
-        "webSocketsEnabled": false,
-        "alwaysOn": false,
-        "managedPipelineMode": "Integrated",
-        "virtualApplications": [
-          {
-            "virtualPath": "/",
-            "physicalPath": "site\\wwwroot",
-            "preloadEnabled": false
-          }
-        ],
-        "loadBalancing": "LeastRequests",
-        "experiments": {
-          "rampUpRules": []
-        },
-        "autoHealEnabled": false,
-        "vnetName": "ae848459-eb29-4eae-aba7-a8090bbd3677_Subnet-1",
-        "vnetRouteAllEnabled": true,
-        "vnetPrivatePortsCount": 0,
-        "publicNetworkAccess": "Enabled",
-        "localMySqlEnabled": false,
-        "xManagedServiceIdentityId": 12559,
-        "ipSecurityRestrictions": [
-          {
-            "ipAddress": "Any",
-            "action": "Allow",
-            "priority": 2147483647,
-            "name": "Allow all",
-            "description": "Allow all access"
-          }
-        ],
-        "scmIpSecurityRestrictions": [
-          {
-            "ipAddress": "Any",
-            "action": "Allow",
-            "priority": 2147483647,
-            "name": "Allow all",
-            "description": "Allow all access"
-          }
-        ],
-        "scmIpSecurityRestrictionsUseMain": false,
-        "http20Enabled": false,
-        "minTlsVersion": "1.2",
-        "scmMinTlsVersion": "1.2",
-        "ftpsState": "FtpsOnly",
-        "preWarmedInstanceCount": 0,
-        "functionsRuntimeScaleMonitoringEnabled": false,
-        "minimumElasticInstanceCount": 0,
-        "azureStorageAccounts": {}
       }
     },
     {
