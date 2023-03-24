@@ -24,6 +24,13 @@
   "variables": {},
   "resources": [
     {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "appsettings",
+      "kind": "string",
+      "properties": {}
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2022-03-01",
       "name": "[parameters('serverfarmname')]",
@@ -147,10 +154,20 @@
         "siteConfig": {
           "appSettings": [
             {
-              "ASPNETCORE_ENVIRONMENT": "Development",
-              "AZURE_CLIENT_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
-              "MSI_ENDPOINT": "http://169.254.169.254/",
-              "KEY_VAULT_NAME": "[parameters('keyvaultname')]"
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Development"
+            },
+            {
+              "name":"AZURE_CLIENT_ID",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]"
+            },
+            {
+              "name": "MSI_ENDPOINT",
+              "value": "http://169.254.169.254/"
+            },
+            {
+              "name": "KEY_VAULT_NAME",
+              "value": "[parameters('keyvaultname')]"
             }
           ]
         },
