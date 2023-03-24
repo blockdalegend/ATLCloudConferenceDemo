@@ -250,7 +250,7 @@
         "[resourceId('Microsoft.Web/sites', parameters('sitename'))]"
       ],
       "properties": {
-        "vnetResourceId": "[concat(parameters('virtualnetworkname'), '/subnets/Subnet-1')]",
+        "vnetResourceId": "[concat(resourceId('Microsoft.Networks/ViritualNetworks',parameters('virtualnetworkname')), '/subnets/Subnet-1')]",
         "isSwift": true
       }
     }
