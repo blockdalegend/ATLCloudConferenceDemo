@@ -179,7 +179,7 @@
                 ],
                 "manualPrivateLinkServiceConnections": [],
                 "subnet": {
-                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('virtualnetworkname'), '/subnets/Subnet-2'))]"
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('virtualnetworkname')), '/subnets/Subnet-2')]"
                 },
                 "ipConfigurations": [],
                 "customDnsConfigs": [
