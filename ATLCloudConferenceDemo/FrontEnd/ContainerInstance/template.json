@@ -24,13 +24,6 @@
   "variables": {},
   "resources": [
     {
-      "type": "Microsoft.Web/sites/config",
-      "apiVersion": "2022-03-01",
-      "name": "appsettings",
-      "kind": "string",
-      "properties": {}
-    },
-    {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2022-03-01",
       "name": "[parameters('serverfarmname')]",
@@ -100,7 +93,25 @@
           "alwaysOn": false,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
-          "minimumElasticInstanceCount": 0
+          "minimumElasticInstanceCount": 0,
+          "appSettings": [
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Development"
+            },
+            {
+              "name":"AZURE_CLIENT_ID",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2018-11-30', 'Full').properties.principalId]"
+            },
+            {
+              "name": "MSI_ENDPOINT",
+              "value": "http://169.254.169.254/"
+            },
+            {
+              "name": "KEY_VAULT_NAME",
+              "value": "[parameters('keyvaultname')]"
+            }
+          ]
         },
         "scmSiteAlsoStopped": false,
         "clientAffinityEnabled": false,
