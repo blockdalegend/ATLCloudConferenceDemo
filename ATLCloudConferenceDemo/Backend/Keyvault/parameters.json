@@ -11,7 +11,7 @@
         "privatednszonename": {
             "value": "privatelink.vaultcore.azure.net"
         },
-        "virtualnetworkresourceid": {
+        "virtualnetworkname": {
             "value": "FrontEnd"
         },
         "managedIdentityName": {

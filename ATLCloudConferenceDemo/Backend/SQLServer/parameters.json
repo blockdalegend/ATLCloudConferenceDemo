@@ -8,7 +8,7 @@
       "sqldbname": {
           "value": "confdemodb"
       },
-      "privateEndpoints_SQLEndpoint_name": {
+      "sqlendpointname": {
           "value": "SQLEndpoint"
       },
       "privatelinkdnszonesname": {

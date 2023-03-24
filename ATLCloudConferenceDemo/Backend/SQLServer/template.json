@@ -8,7 +8,7 @@
         "sqldbname": {
             "type": "String"
         },
-        "privateEndpoints_SQLEndpoint_name": {
+        "sqlendpointname": {
             "type": "String"
         },
         "keyvaultname": {
@@ -123,7 +123,7 @@
         {
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2022-07-01",
-            "name": "[parameters('privateEndpoints_SQLEndpoint_name')]",
+            "name": "[parameters('sqlendpointname')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]"
@@ -131,8 +131,8 @@
             "properties": {
                 "privateLinkServiceConnections": [
                     {
-                        "name": "[parameters('privateEndpoints_SQLEndpoint_name')]",
-                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name')), concat('/privateLinkServiceConnections/', parameters('privateEndpoints_SQLEndpoint_name')))]",
+                        "name": "[parameters('sqlendpointname')]",
+                        "id": "[concat(resourceId('Microsoft.Network/privateEndpoints', parameters('sqlendpointname')), concat('/privateLinkServiceConnections/', parameters('sqlendpointname')))]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', parameters('sqlservername'))]",
                             "groupIds": [
@@ -147,7 +147,7 @@
                     }
                 ],
                 "manualPrivateLinkServiceConnections": [],
-                "customNetworkInterfaceName": "[concat(parameters('privateEndpoints_SQLEndpoint_name'), '-nic')]",
+                "customNetworkInterfaceName": "[concat(parameters('sqlendpointname'), '-nic')]",
                 "subnet": {
                     "id": "[concat(resourceid('Microsoft.Network/virtualNetworks', parameters('virtualnetworkname')), '/subnets/Subnet-3')]"
                 },
@@ -199,9 +199,9 @@
         {
             "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
             "apiVersion": "2022-07-01",
-            "name": "[concat(parameters('privateEndpoints_SQLEndpoint_name'), '/default')]",
+            "name": "[concat(parameters('sqlendpointname'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_SQLEndpoint_name'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('sqlendpointname'))]",
                 "[resourceId('Microsoft.Network/privateDnsZones', parameters('privatelinkdnszonesname'))]"
             ],
             "properties": {

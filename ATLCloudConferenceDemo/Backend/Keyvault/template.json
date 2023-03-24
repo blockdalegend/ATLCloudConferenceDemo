@@ -11,7 +11,7 @@
         "privatednszonename": {
             "type": "String"
         },
-        "virtualnetworkresourceid": {
+        "virtualnetworkname": {
             "type": "String"
         },
         "managedIdentityName": {
@@ -148,7 +148,7 @@
             "properties": {
                 "registrationEnabled": false,
                 "virtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualnetworkresourceid'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualnetworkname'))]"
                 }
             }
         },
@@ -179,7 +179,7 @@
                 ],
                 "manualPrivateLinkServiceConnections": [],
                 "subnet": {
-                    "id": "[concat(parameters('virtualnetworkresourceid'), '/subnets/Subnet-2')]"
+                    "id": "[concat(parameters('virtualnetworkname'), '/subnets/Subnet-2')]"
                 },
                 "ipConfigurations": [],
                 "customDnsConfigs": [

@@ -6,7 +6,7 @@
       "value": "atlconferencedemo"
     },
     "serverfarmname": {
-      "value": "ASP-ATLCloudConferenceDemo-b5a9"
+      "value": "ASP-ATLCloudConferenceDemo"
     },
     "virtualnetworkname": {
       "value": "FrontEnd"
